@@ -10,9 +10,26 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+
+// Note: cleanup is done by the OS in case of error
 int scrivi_immagine(const char *filename, unsigned char *data, int width, int height)
 {
+    // Calculate data size
+    int w = (int)((ceil(log10(width))) * sizeof(char));
+    int h = (int)((ceil(log10(height))) * sizeof(char));
+    int preambolo_size = 3 + w + 1 + h + 5 + 1;
+    int data_size = width * height * 3;
 
+    // Create file header
+    char *preambolo = (char *)malloc((preambolo_size) * sizeof(char));
+    if (preambolo == NULL)
+    {
+        perror("Can't allocate memory for preambolo");
+    return 1;
+    }
+    sprintf(preambolo, "P6\n%d %d\n255\n", width, height);
+
+    // Open file and get file descriptor
     FILE *file = fopen(filename, "w+");
     if (file == NULL)
     {
@@ -24,31 +41,23 @@ int scrivi_immagine(const char *filename, unsigned char *data, int width, int he
     if (fd == -1)
     {
         perror("Error getting file descriptor");
-        return 1;
+return 1;
     }
 
-    int w = (int)((ceil(log10(width))) * sizeof(char));
-    int h = (int)((ceil(log10(height))) * sizeof(char));
-    int preambolo_size = 3 + w + 1 + h + 5 + 1;
-    int data_size = width * height * 3;
-    printf("preambolo_size: %d\n", preambolo_size);
-    printf("data_size: %d\n", data_size);
-
-    
+    // Ensure file is large enough
     if (ftruncate(fd, preambolo_size + data_size) == -1)
     {
         perror("Error setting file size");
-        close(fd);
         return 1;
     }
-    
+
+    // Stat file needed for mmap
     struct stat statbuf;
     if (stat(filename, &statbuf) < 0)
     {
         perror("stat error");
         return 1;
     }
-
 
     void *addr = mmap(NULL, statbuf.st_size, PROT_WRITE, MAP_SHARED, fd, 0);
     if (addr == MAP_FAILED)
@@ -57,14 +66,11 @@ int scrivi_immagine(const char *filename, unsigned char *data, int width, int he
         return 1;
     }
 
-
-
-    char *preambolo = (char *)malloc((preambolo_size) * sizeof(char));
-    sprintf(preambolo, "P6\n%d %d\n255\n", width, height);
-
+    // Write data
     memcpy(addr, preambolo, preambolo_size);
-
     memcpy((char *)addr + preambolo_size, data, data_size);
+
+    // Cleanup
     free(preambolo);
     munmap(addr, statbuf.st_size);
     fclose(file);
