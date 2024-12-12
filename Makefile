@@ -1,7 +1,7 @@
 #Francesco Carollo SM3201419
 
 CC = gcc
-CFLAGS = -O3 -Wall -pedantic -std=c17 
+CFLAGS = -g -Wall -pedantic -std=c17 -lm
 HEADERS = ${wildcards *.h}
 
 all: main
