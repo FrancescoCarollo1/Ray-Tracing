@@ -11,7 +11,7 @@ int main ()
     unsigned char data[640*480*3];
     for (int i = 0; i < 640*480*3; i++)
     {
-        data[i] = 255;
+        data[i] = i % 256;
     }
 
     scrivi_immagine("prova.ppm", data, 640, 480);
