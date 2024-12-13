@@ -2,19 +2,25 @@
 
 CC = gcc
 CFLAGS = -g -Wall -pedantic -std=c17 -lm -fopenmp
-HEADERS = ${wildcards *.h}
+SRCDIR   = src
+HEADDIR  = src
+OBJDIR   = build
+
+SOURCES  := $(wildcard $(SRCDIR)/*.c)
+HEADERS := $(wildcard $(HEADDIR)/*.h)
+OBJECTS  := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
 all: main
 
-main: main.o ppm.o scene.o
+main: ${OBJECTS}
 	${CC} ${CFLAGS} -o $@ $^
 
-%.o: %.c ${HEADERS}
-	${CC} ${CFLAGS} -c $<
+build/%.o: src/%.c ${HEADERS}
+	${CC} ${CFLAGS} -c $< -o $@
 
-.PHONY: clean all
 
 clean:
-	rm -f *.o
+	rm -f build/*.o
 	rm -f main
+	rm -f *.ppm
 	
