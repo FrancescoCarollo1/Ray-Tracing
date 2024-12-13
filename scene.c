@@ -3,45 +3,14 @@
 
 #include <stdio.h>
 #include <stddef.h>
-#include <math.h>
-#include <omp.h>
 #include <stdlib.h>
-
+#include <stdint.h>
+#include "scene.h"
 
 //Define the data types
 
-typedef struct 
-{
-    float width;
-    float height;
-    float depth;
-}Viewport;
 
-typedef struct
-{
-   int r;
-   int g;
-   int b;
-}Color;
-
-typedef struct 
-{
-    float x;
-    float y;
-    float z;
-    float radius;
-    Color color;
-}Sphere;
-
-typedef struct
-{
-    Viewport viewport;
-    int num_spheres;
-    Sphere *spheres;
-}Scene;
-
-
-void read_scene(const char *filename, Scene *scene)
+int read_scene(const char *filename, Scene *scene)
 {
 
     // Open the file
@@ -49,41 +18,51 @@ void read_scene(const char *filename, Scene *scene)
     if (file == NULL)
     {
         perror("Error opening file");
-        return;
+        return 1;
     }
 
     // Read the viewport
-    if (fscanf(file, "%f %f %f\n", &scene->viewport.width, &scene->viewport.height, &scene->viewport.depth) != 3)
+    if (fscanf(file, "VP  %f %f %f\n", &scene->viewport.width, &scene->viewport.height, &scene->viewport.depth) != 3)
     {
         perror("Error reading viewport");
-        return;
+        return 1;
+    }
+
+    // Read the background color
+
+    if (fscanf(file, "BG %hhu %hhu %hhu\n", &scene->background_color.r, &scene->background_color.g, &scene->background_color.b) != 3)
+    {
+        perror("Error reading background color");
+        return 1;
     }
 
     // Read the number of spheres
-    if (fscanf(file, "%d\n", &scene->num_spheres) < 0)
+    if (fscanf(file, "OBJ_N %d\n", &scene->num_spheres) != 1)
     {
-        perror("The number of spheres is negative");
-        return;
+        perror("Error reading number of spheres");
+        return 1;
     }
+   
     
     // Allocate memory for the spheres
     scene->spheres = (Sphere *)malloc(scene->num_spheres * sizeof(Sphere));
     if (scene->spheres == NULL)
     {
         perror("Can't allocate memory for spheres");
-        return;
+        return 1;
     }
 
     // Read the spheres
     for (int i = 0; i < scene->num_spheres; i++)
     {
-       if (fscanf(file, "%f %f %f %f %d %d %d\n", &scene->spheres[i].x, &scene->spheres[i].y, &scene->spheres[i].z, &scene->spheres[i].radius, &scene->spheres[i].color.r, &scene->spheres[i].color.g, &scene->spheres[i].color.b) != 7)
+       if (fscanf(file, "S %f %f %f %f %hhu %hhu %hhu\n", &scene->spheres[i].x, &scene->spheres[i].y, &scene->spheres[i].z, &scene->spheres[i].radius, &scene->spheres[i].color.r, &scene->spheres[i].color.g, &scene->spheres[i].color.b) != 7)
        {
            perror("Error reading sphere");
-           return;
+           return 1;
        }
 
 
     }
+    return 0;
 }
 
