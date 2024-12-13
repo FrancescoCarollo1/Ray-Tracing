@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "ppm.h"
+#include "scene.h"
 
 
 int main ()
@@ -14,5 +15,15 @@ int main ()
         data[i] = i % 256;
     }
 
+    
+
+    
+    
+
+    Scene *scene = malloc(sizeof(Scene));
+    read_scene("prova.txt", scene);
+    
+   
     scrivi_immagine("prova.ppm", data, 640, 480);
-}
+    return 0;
+}   
