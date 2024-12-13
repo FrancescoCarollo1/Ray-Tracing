@@ -22,7 +22,7 @@ int read_scene(const char *filename, Scene *scene)
     }
 
     // Read the viewport
-    if (fscanf(file, "VP  %f %f %f\n", &scene->viewport.width, &scene->viewport.height, &scene->viewport.depth) != 3)
+    if (fscanf(file, "VP %f %f %f\n", &scene->viewport.width, &scene->viewport.height, &scene->viewport.depth) != 3)
     {
         perror("Error reading viewport");
         return 1;
