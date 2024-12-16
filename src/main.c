@@ -5,18 +5,19 @@
 #include <math.h>
 #include "ppm.h"
 #include "scene.h"
+#include "render.h"
+#include <string.h>
 
 
 int main ()
 {
-    unsigned char data[640*480*3];
-    for (int i = 0; i < 640*480*3; i++)
-    {
-        data[i] = i % 256;
-    }
-    
+    int width = 1920;
+    int height = 1080;
+    unsigned char *data = malloc(width*height*3);
+    memset (data, 0, width*height*3);
     Scene *scene = malloc(sizeof(Scene));
     read_scene("prova.txt", scene);
-    scrivi_immagine("prova.ppm", data, 640, 480);
+    render_scene(scene, data, width, height);
+    scrivi_immagine("prova.ppm", data, width, height);
     return 0;
 }   
