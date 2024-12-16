@@ -68,7 +68,7 @@ return 1;
 
     // Write data
     memcpy(addr, preambolo, preambolo_size);
-    memcpy((char *)addr + preambolo_size, data, data_size);
+    memcpy((char *)addr + preambolo_size - 1, data, data_size);
 
     // Cleanup
     free(preambolo);

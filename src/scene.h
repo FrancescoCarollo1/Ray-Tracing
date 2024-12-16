@@ -1,6 +1,8 @@
 //Francesco Carollo SM3201419
 
+#pragma once
 #include <stdint.h>
+#include "vec3.h"
 
 
 
@@ -11,6 +13,9 @@ typedef struct
     float depth;
 }Viewport;
 
+
+
+
 typedef struct __attribute__ ((packed))
 {
    uint8_t r;
@@ -20,9 +25,7 @@ typedef struct __attribute__ ((packed))
 
 typedef struct 
 {
-    float x;
-    float y;
-    float z;
+    Vec3 center;
     float radius;
     Color color;
 }Sphere;
