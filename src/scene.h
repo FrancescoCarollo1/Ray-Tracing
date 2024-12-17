@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "vec3.h"
 
-
+//Define the data types
 
 typedef struct 
 {
@@ -12,9 +12,6 @@ typedef struct
     float height;
     float depth;
 }Viewport;
-
-
-
 
 typedef struct __attribute__ ((packed))
 {
@@ -39,5 +36,7 @@ typedef struct
 }Scene;
 
 
-
+//Function prototypes
+Scene *create_empty_scene();
+void delete_scene(Scene *s);
 int read_scene(const char *filename, Scene *scene);
