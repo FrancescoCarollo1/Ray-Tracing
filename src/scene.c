@@ -11,10 +11,22 @@
 
 //Define the data types
 
+Scene *create_empty_scene()
+{
+    Scene *scene = (Scene *)malloc(sizeof(Scene));
+    if (scene == NULL)
+    {
+        perror("Can't allocate memory for scene");
+        return NULL;
+    }
+    scene->spheres = NULL;
+    scene->num_spheres = 0;
+    return scene;
+}
+
 
 int read_scene(const char *filename, Scene *scene)
 {
-
     // Open the file
     FILE *file = fopen(filename, "r");
     if (file == NULL)
@@ -66,5 +78,11 @@ int read_scene(const char *filename, Scene *scene)
 
     }
     return 0;
+}
+
+void delete_scene(Scene *s)
+{
+    free(s->spheres);
+    free(s);
 }
 
