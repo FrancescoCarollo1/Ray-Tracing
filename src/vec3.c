@@ -1,3 +1,7 @@
+//Francesco Carollo SM3201419
+
+//Questo file contiene le funzioni per la gestione dei vettori
+
 #include "vec3.h"
 #include <math.h>
 

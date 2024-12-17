@@ -1,20 +1,21 @@
+//Francesco Carollo SM3201419
+
 #include "render.h"
 #include "vec3.h"
 #include <stdlib.h>
 #include <math.h>
 #include "ppm.h"
+#include "scene.h"
 
 
 
-
-
-
+//Questa funzione implementa il calcolo della distanza tra un raggio e una sfera
 float distanza_sfera(Vec3 ray, Sphere sphere)
 {
     float a = prodotto_scalare(ray, ray);
     float b = -2 * (prodotto_scalare(ray, sphere.center));
     float c = prodotto_scalare(sphere.center, sphere.center) - sphere.radius * sphere.radius;
-    float delta = b * b - 4 * a * c;
+    float delta = (b * b) - (4 * a * c);
     if (delta < 0)
     {
         return INFINITY;
@@ -36,6 +37,7 @@ float distanza_sfera(Vec3 ray, Sphere sphere)
     return t1 < t2 ? t1 : t2;
 }
 
+//Questa funzione calcola il colore di un raggio
 Color colore_raggio(Vec3 ray, Scene *scene)
 {  
     Color colore = scene->background_color;
@@ -53,7 +55,8 @@ Color colore_raggio(Vec3 ray, Scene *scene)
         return colore;
 }
 
-void render_scene(Scene *scene, unsigned char *pixel_out, int width, int height)
+//Questa funzione riempie un array di pixel con i colori della scena
+void render_scene(Scene *scene, Color *pixel_out, int width, int height)
 {
     for (int i = 0; i < width; i++)
     {
@@ -65,9 +68,10 @@ void render_scene(Scene *scene, unsigned char *pixel_out, int width, int height)
             ray.z = scene->viewport.depth;
             Vec3 norm_ray = normalize(ray);
             Color pixel = colore_raggio(norm_ray, scene);
-            pixel_out[0 + (i + j * width) * 3 ] = pixel.r;
-            pixel_out[1 + (i + j * width) * 3 ] = pixel.g;
-            pixel_out[2 + (i + j * width) * 3 ] = pixel.b;
+            pixel_out [i + j * width] = pixel;
+            //pixel_out[0 + (i + j * width) * 3 ] = pixel.r;
+            //pixel_out[1 + (i + j * width) * 3 ] = pixel.g;
+            //pixel_out[2 + (i + j * width) * 3 ] = pixel.b;
         }
     }
 }
