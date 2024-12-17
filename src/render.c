@@ -56,6 +56,24 @@ Color colore_raggio(Vec3 ray, Scene *scene)
 }
 
 //Questa funzione riempie un array di pixel con i colori della scena
+void omp_render_scene(Scene *scene, Color *pixel_out, int width, int height)
+{
+    #pragma omp parallel for collapse(2)
+    for (int i = 0; i < width; i++)
+    {
+        for (int j = 0; j < height; j++)
+        { 
+            Vec3 ray;
+            ray.x = scene->viewport.width * (2 * i / (float)width - 1);
+            ray.y = -scene->viewport.height * (2 * j / (float)height - 1);
+            ray.z = scene->viewport.depth;
+            Vec3 norm_ray = normalize(ray);
+            Color pixel = colore_raggio(norm_ray, scene);
+            pixel_out [i + j * width] = pixel;
+        }
+    }
+}
+
 void render_scene(Scene *scene, Color *pixel_out, int width, int height)
 {
     for (int i = 0; i < width; i++)
@@ -69,9 +87,6 @@ void render_scene(Scene *scene, Color *pixel_out, int width, int height)
             Vec3 norm_ray = normalize(ray);
             Color pixel = colore_raggio(norm_ray, scene);
             pixel_out [i + j * width] = pixel;
-            //pixel_out[0 + (i + j * width) * 3 ] = pixel.r;
-            //pixel_out[1 + (i + j * width) * 3 ] = pixel.g;
-            //pixel_out[2 + (i + j * width) * 3 ] = pixel.b;
         }
     }
 }
