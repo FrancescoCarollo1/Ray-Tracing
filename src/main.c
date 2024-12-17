@@ -37,13 +37,13 @@ int main()
     Color *data = malloc(width * height * 3);
     memset(data, 0, width * height * 3);
     
-    //Scene *scene = malloc(sizeof(Scene));
-    //read_scene("prova.txt", scene);
-    //render_scene(scene, data, width, height);
+    Scene *scene = malloc(sizeof(Scene));
+    read_scene("prova.txt", scene);
+    render_scene(scene, data, width, height);
 
     printf ("Time: tempo per renderizzare %f ms\n", test_render_scene(render_scene));
     printf ("Time: tempo per renderizzare in parallelo %f ms\n", test_render_scene(omp_render_scene));        scrivi_immagine("prova.ppm", data, width, height);
-    //scrivi_immagine("prova.ppm", data, width, height);
+    scrivi_immagine("prova.ppm", data, width, height);
 
 }
 
