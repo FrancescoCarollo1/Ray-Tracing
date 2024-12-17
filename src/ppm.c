@@ -9,15 +9,20 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include "scene.h"
+
 
 
 // Note: cleanup is done by the OS in case of error
-int scrivi_immagine(const char *filename, unsigned char *data, int width, int height)
+
+// La funzione scrivi_immagine scrive un'immagine in formato PPM
+int scrivi_immagine(const char *filename, Color *data, int width, int height)
 {
     // Calculate data size
+    // Calculate the number of digits needed for width and height
     int w = (int)((ceil(log10(width))) * sizeof(char));
     int h = (int)((ceil(log10(height))) * sizeof(char));
-    int preambolo_size = 3 + w + 1 + h + 5 + 1;
+    int preambolo_size = 3 + w + 1 + h + 1 + 4 + 1;
     int data_size = width * height * 3;
 
     // Create file header
@@ -28,6 +33,7 @@ int scrivi_immagine(const char *filename, unsigned char *data, int width, int he
     return 1;
     }
     sprintf(preambolo, "P6\n%d %d\n255\n", width, height);
+
 
     // Open file and get file descriptor
     FILE *file = fopen(filename, "w+");

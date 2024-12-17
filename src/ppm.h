@@ -1,6 +1,7 @@
 //Francesco Carollo SM3201419
 
+#include "scene.h"
 #pragma once
 
-
-int scrivi_immagine(const char *filename, unsigned char *data, int width, int height);
+//Define the function prototypes
+int scrivi_immagine(const char *filename, Color *data, int width, int height);

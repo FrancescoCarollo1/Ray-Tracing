@@ -1,5 +1,8 @@
+//Francesco Carollo SM3201419
+
 #pragma once
 #include "scene.h"
 
 
-void render_scene (Scene *scene, unsigned char *pixel_out, int width, int height);
+//Define the function prototypes
+void render_scene (Scene *scene, Color *pixel_out, int width, int height);
