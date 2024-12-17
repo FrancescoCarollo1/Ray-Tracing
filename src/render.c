@@ -6,6 +6,7 @@
 #include <math.h>
 #include "ppm.h"
 #include "scene.h"
+#include <omp.h>
 
 
 
@@ -68,8 +69,7 @@ void omp_render_scene(Scene *scene, Color *pixel_out, int width, int height)
             ray.y = -scene->viewport.height * (2 * j / (float)height - 1);
             ray.z = scene->viewport.depth;
             Vec3 norm_ray = normalize(ray);
-            Color pixel = colore_raggio(norm_ray, scene);
-            pixel_out [i + j * width] = pixel;
+            pixel_out [i + j * width] = colore_raggio(norm_ray, scene);
         }
     }
 }
@@ -85,8 +85,7 @@ void render_scene(Scene *scene, Color *pixel_out, int width, int height)
             ray.y = -scene->viewport.height * (2 * j / (float)height - 1);
             ray.z = scene->viewport.depth;
             Vec3 norm_ray = normalize(ray);
-            Color pixel = colore_raggio(norm_ray, scene);
-            pixel_out [i + j * width] = pixel;
+            pixel_out [i + j * width] =  colore_raggio(norm_ray, scene);
         }
     }
 }
