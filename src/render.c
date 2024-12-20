@@ -44,18 +44,33 @@ Color colore_raggio(Vec3 ray, Scene *scene)
     Color colore = scene->background_color;
     float distanza_minima = INFINITY;
     for (int i = 0; i < scene->num_spheres; i++)
-    {  
+    {
         float dist_s = distanza_sfera(ray, scene->spheres[i]);
         if (dist_s < distanza_minima)
         {
             distanza_minima = dist_s;
             colore = scene->spheres[i].color;
         }
-    
     }
-        return colore;
+    return colore;
 }
 
+Color omp_colore_raggio(Vec3 ray, Scene *scene)
+{  
+    Color colore = scene->background_color;
+    float distanza_minima = INFINITY;
+    #pragma omp parallel for
+    for (int i = 0; i < scene->num_spheres; i++)
+    {
+        float dist_s = distanza_sfera(ray, scene->spheres[i]);
+        if (dist_s < distanza_minima)
+        {
+            distanza_minima = dist_s;
+            colore = scene->spheres[i].color;
+        }
+    }
+    return colore;
+}
 //Questa funzione riempie un array di pixel con i colori della scena
 void omp_render_scene(Scene *scene, Color *pixel_out, int width, int height)
 {
