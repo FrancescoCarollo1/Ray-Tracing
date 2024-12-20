@@ -33,8 +33,6 @@ double test_render_scene(void (* render_scene)(Scene *, Color *, int, int))
 
 double test_colore_raggio(Color (*colore_raggio)(Vec3 ray, Scene *scene))
 {
-    Scene *scene = malloc(sizeof(Scene));
-
     double start = omp_get_wtime();
     double end = omp_get_wtime();
     double ms = (end - start) * 1000;
@@ -53,10 +51,9 @@ int main()
     int height = 1080;
     Color *data = malloc(width * height * sizeof(Color));
     memset(data, 0, width * height * sizeof(Color));
-    
     Scene *scene = create_empty_scene();
     read_scene("prova.txt", scene);
-    render_scene(scene, data, width, height);
+    //render_scene(scene, data, width, height);
 
     int n = 5;
 
