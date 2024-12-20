@@ -1,4 +1,4 @@
-//Francesco Carollo SM3201419
+// Francesco Carollo SM3201419
 
 #include "render.h"
 #include "vec3.h"
@@ -8,9 +8,7 @@
 #include "scene.h"
 #include <omp.h>
 
-
-
-//Questa funzione implementa il calcolo della distanza tra un raggio e una sfera
+// Questa funzione implementa il calcolo della distanza tra un raggio e una sfera
 float distanza_sfera(Vec3 ray, Sphere sphere)
 {
     float a = prodotto_scalare(ray, ray);
@@ -38,9 +36,9 @@ float distanza_sfera(Vec3 ray, Sphere sphere)
     return t1 < t2 ? t1 : t2;
 }
 
-//Questa funzione calcola il colore di un raggio
+// Questa funzione calcola il colore di un raggio
 Color colore_raggio(Vec3 ray, Scene *scene)
-{  
+{
     Color colore = scene->background_color;
     float distanza_minima = INFINITY;
     for (int i = 0; i < scene->num_spheres; i++)
@@ -56,10 +54,10 @@ Color colore_raggio(Vec3 ray, Scene *scene)
 }
 
 Color omp_colore_raggio(Vec3 ray, Scene *scene)
-{  
+{
     Color colore = scene->background_color;
     float distanza_minima = INFINITY;
-    #pragma omp parallel for
+    #pragma omp for
     for (int i = 0; i < scene->num_spheres; i++)
     {
         float dist_s = distanza_sfera(ray, scene->spheres[i]);
@@ -71,20 +69,23 @@ Color omp_colore_raggio(Vec3 ray, Scene *scene)
     }
     return colore;
 }
-//Questa funzione riempie un array di pixel con i colori della scena
+// Questa funzione riempie un array di pixel con i colori della scena
 void omp_render_scene(Scene *scene, Color *pixel_out, int width, int height)
 {
-    #pragma omp parallel for collapse(2)
-    for (int i = 0; i < width; i++)
+    #pragma omp parallel
     {
-        for (int j = 0; j < height; j++)
-        { 
-            Vec3 ray;
-            ray.x = scene->viewport.width * (2 * i / (float)width - 1);
-            ray.y = -scene->viewport.height * (2 * j / (float)height - 1);
-            ray.z = scene->viewport.depth;
-            Vec3 norm_ray = normalize(ray);
-            pixel_out [i + j * width] = colore_raggio(norm_ray, scene);
+        #pragma omp for collapse(2)
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                Vec3 ray;
+                ray.x = scene->viewport.width * (2 * i / (float)width - 1);
+                ray.y = -scene->viewport.height * (2 * j / (float)height - 1);
+                ray.z = scene->viewport.depth;
+                Vec3 norm_ray = normalize(ray);
+                pixel_out[i + j * width] = omp_colore_raggio(norm_ray, scene);
+            }
         }
     }
 }
@@ -94,13 +95,13 @@ void render_scene(Scene *scene, Color *pixel_out, int width, int height)
     for (int i = 0; i < width; i++)
     {
         for (int j = 0; j < height; j++)
-        { 
+        {
             Vec3 ray;
             ray.x = scene->viewport.width * (2 * i / (float)width - 1);
             ray.y = -scene->viewport.height * (2 * j / (float)height - 1);
             ray.z = scene->viewport.depth;
             Vec3 norm_ray = normalize(ray);
-            pixel_out [i + j * width] =  colore_raggio(norm_ray, scene);
+            pixel_out[i + j * width] = colore_raggio(norm_ray, scene);
         }
     }
 }
