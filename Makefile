@@ -22,5 +22,5 @@ build/%.o: src/%.c ${HEADERS}
 clean:
 	rm -f build/*.o
 	rm -f main
-	rm -f *.ppm
+	rm -f renders/*.ppm
 	
