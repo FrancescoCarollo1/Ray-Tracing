@@ -14,5 +14,4 @@ typedef struct
 //Define the function prototypes
 
 Vec3 normalize(Vec3 v);
-
 float prodotto_scalare(Vec3 v1, Vec3 v2);
