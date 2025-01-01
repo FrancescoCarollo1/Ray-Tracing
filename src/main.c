@@ -52,21 +52,9 @@ int main()
     Color *data = malloc(width * height * sizeof(Color));
     memset(data, 0, width * height * sizeof(Color));
     Scene *scene = create_empty_scene();
-    read_scene("prova.txt", scene);
-    //render_scene(scene, data, width, height);
-
-    int n = 5;
-
-    for (int i = 0; i < n; i++)
-    {
-    
-    printf ("Time: tempo per calcolare il colore di un raggio %f ms\n", test_colore_raggio(colore_raggio));
-    printf ("Time: tempo per calcolare il colore di un raggio in parallelo %f ms\n", test_colore_raggio(omp_colore_raggio));
-    printf ("Time: tempo per renderizzare %f ms\n", test_render_scene(render_scene));
-    printf ("Time: tempo per renderizzare in parallelo %f ms\n", test_render_scene(omp_render_scene));      
-    }
-    
-    //scrivi_immagine("prova.ppm", data, width, height);
+    read_scene("prove_txt/prova11.txt", scene);
+    render_scene(scene, data, width, height);
+    scrivi_immagine("renders/prova11.ppm", data, width, height);
 
     free(data);
     delete_scene(scene);

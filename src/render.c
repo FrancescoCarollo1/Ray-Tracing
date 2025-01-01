@@ -19,6 +19,7 @@ float distanza_sfera(Vec3 ray, Sphere sphere)
     {
         return INFINITY;
     }
+    
     float t1 = (-b + sqrt(delta)) / (2 * a);
     float t2 = (-b - sqrt(delta)) / (2 * a);
     if (t1 < 0 && t2 < 0)
