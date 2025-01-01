@@ -11,8 +11,6 @@
 #include <unistd.h>
 #include "scene.h"
 
-
-
 // Note: cleanup is done by the OS in case of error
 
 // La funzione scrivi_immagine scrive un'immagine in formato PPM
@@ -30,10 +28,9 @@ int scrivi_immagine(const char *filename, Color *data, int width, int height)
     if (preambolo == NULL)
     {
         perror("Can't allocate memory for preambolo");
-    return 1;
+        return 1;
     }
     sprintf(preambolo, "P6\n%d %d\n255\n", width, height);
-
 
     // Open file and get file descriptor
     FILE *file = fopen(filename, "w+");
@@ -47,7 +44,7 @@ int scrivi_immagine(const char *filename, Color *data, int width, int height)
     if (fd == -1)
     {
         perror("Error getting file descriptor");
-return 1;
+        return 1;
     }
 
     // Ensure file is large enough
