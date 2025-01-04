@@ -61,7 +61,6 @@ int scrivi_immagine(const char *filename, Color *data, int width, int height)
         perror("stat error");
         return 1;
     }
-
     void *addr = mmap(NULL, statbuf.st_size, PROT_WRITE, MAP_SHARED, fd, 0);
     if (addr == MAP_FAILED)
     {

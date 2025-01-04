@@ -1,5 +1,9 @@
 #include "test.h"
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <omp.h>
+
 
 
 // Queste funzioni prendono in input un puntatore a funzione e restituiscono il tempo impiegato per eseguire la funzione passata come argomento
