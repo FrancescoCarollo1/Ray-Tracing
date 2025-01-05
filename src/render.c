@@ -81,10 +81,10 @@ void omp_render_scene(Scene *scene, Color *pixel_out, int width, int height)
             for (int j = 0; j < height; j++)
             {
                 Vec3 ray;
-                ray.x = scene->viewport.width * (2 * i / (float)width - 1);
-                ray.y = -scene->viewport.height * (2 * j / (float)height - 1);
-                ray.z = scene->viewport.depth;
                 Vec3 norm_ray = normalize(ray);
+                norm_ray.x = scene->viewport.width * (2 * i / (float)width - 1);
+                norm_ray.y = -scene->viewport.height * (2 * j / (float)height - 1);
+                norm_ray.z = scene->viewport.depth ;
                 pixel_out[i + j * width] = omp_colore_raggio(norm_ray, scene);
             }
         }
@@ -98,9 +98,9 @@ void render_scene(Scene *scene, Color *pixel_out, int width, int height)
         for (int j = 0; j < height; j++)
         {
             Vec3 ray;
-            ray.x = scene->viewport.width * (2 * i / (float)width - 1);
-            ray.y = -scene->viewport.height * (2 * j / (float)height - 1);
-            ray.z = scene->viewport.depth;
+            ray.x = (2 * i / (float)width - 1) * (scene->viewport.width / 2);
+            ray.y = (2 * j / (float)height - 1) * (-scene->viewport.height / 2) ;
+            ray.z = scene->viewport.depth ;
             Vec3 norm_ray = normalize(ray);
             pixel_out[i + j * width] = colore_raggio(norm_ray, scene);
         }

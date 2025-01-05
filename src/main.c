@@ -24,9 +24,9 @@ int main()
     Color *data = malloc(width * height * sizeof(Color));
     memset(data, 0, width * height * sizeof(Color));
     Scene *scene = create_empty_scene();
-    read_scene("prove_txt/prova8.txt", scene);
+    read_scene("prove_txt/prova1.txt", scene);
     render_scene(scene, data, width, height);
-    scrivi_immagine("renders/prova8.ppm", data, width, height);
+    scrivi_immagine("renders/prova1.ppm", data, width, height);
 
     free(data);
     delete_scene(scene);
