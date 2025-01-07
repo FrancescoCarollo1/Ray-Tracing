@@ -4,8 +4,7 @@
 #include <stdint.h>
 #include "vec3.h"
 
-//Define the data types
-
+// Definizione delle strutture dati
 typedef struct 
 {
     float width;
@@ -35,8 +34,7 @@ typedef struct
     Sphere *spheres;
 }Scene;
 
-
-//Function prototypes
+// Prototipi delle funzioni
 Scene *create_empty_scene();
 int read_scene(const char *filename, Scene *scene);
 void delete_scene(Scene *s);

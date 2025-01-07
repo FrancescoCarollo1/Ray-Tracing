@@ -3,5 +3,5 @@
 #include "scene.h"
 #pragma once
 
-//Define the function prototypes
+// Prototipo della funzione
 int scrivi_immagine(const char *filename, Color *data, int width, int height);

@@ -26,7 +26,7 @@ Scene *create_empty_scene()
 
 int read_scene(const char *filename, Scene *scene)
 {
-    // Open the file
+    // Apertura del file
     FILE *file = fopen(filename, "r");
     if (file == NULL)
     {
@@ -34,28 +34,28 @@ int read_scene(const char *filename, Scene *scene)
         return 1;
     }
 
-    // Read the viewport
+    // Lettura del viewport
     if (fscanf(file, "VP %f %f %f\n", &scene->viewport.width, &scene->viewport.height, &scene->viewport.depth) != 3)
     {
         printf("Error reading viewport\n");
         return 1;
     }
 
-    // Read the background color
+    // Lettura del colore di sfondo
     if (fscanf(file, "BG %hhu %hhu %hhu\n", &scene->background_color.r, &scene->background_color.g, &scene->background_color.b) != 3)
     {
         printf("Error reading background color\n");
         return 1;
     }
 
-    // Read the number of spheres
+    // Lettura del numero di sfere
     if (fscanf(file, "OBJ_N %d\n", &scene->num_spheres) != 1)
     {
         printf("Error reading number of spheres\n");
         return 1;
     }
     
-    // Allocate memory for the spheres
+    // Allocazione della memoria per le sfere
     scene->spheres = (Sphere *)malloc(scene->num_spheres * sizeof(Sphere));
     if (scene->spheres == NULL)
     {
@@ -63,7 +63,7 @@ int read_scene(const char *filename, Scene *scene)
         return 1;
     }
 
-    // Read the spheres
+    // Lettura delle sfere
     for (int i = 0; i < scene->num_spheres; i++)
     {
        if (fscanf(file, "S %f %f %f %f %hhu %hhu %hhu\n", &scene->spheres[i].center.x, &scene->spheres[i].center.y, &scene->spheres[i].center.z, &scene->spheres[i].radius, &scene->spheres[i].color.r, &scene->spheres[i].color.g, &scene->spheres[i].color.b) != 7)

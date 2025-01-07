@@ -16,14 +16,13 @@
 // La funzione scrivi_immagine scrive un'immagine in formato PPM
 int scrivi_immagine(const char *filename, Color *data, int width, int height)
 {
-    // Calculate data size
-    // Calculate the number of digits needed for width and height
+    // Calcola il numero di cifre necessarie per rappresentare width e height
     int w = (int)((ceil(log10(width))) * sizeof(char));
     int h = (int)((ceil(log10(height))) * sizeof(char));
     int preambolo_size = 3 + w + 1 + h + 1 + 4 + 1;
     int data_size = width * height * 3;
 
-    // Create file header
+    // Crea il file header
     char *preambolo = (char *)malloc((preambolo_size) * sizeof(char));
     if (preambolo == NULL)
     {
@@ -32,7 +31,7 @@ int scrivi_immagine(const char *filename, Color *data, int width, int height)
     }
     sprintf(preambolo, "P6\n%d %d\n255\n", width, height);
 
-    // Open file and get file descriptor
+    // Apre il file e ottiene il file descriptor
     FILE *file = fopen(filename, "w+");
     if (file == NULL)
     {
@@ -47,14 +46,14 @@ int scrivi_immagine(const char *filename, Color *data, int width, int height)
         return 1;
     }
 
-    // Ensure file is large enough
+    // Si assicura che il file abbia la dimensione corretta
     if (ftruncate(fd, preambolo_size + data_size) == -1)
     {
         printf("Error setting file size\n");
         return 1;
     }
 
-    // Stat file needed for mmap
+    // Stat file necessario per mmap
     struct stat statbuf;
     if (stat(filename, &statbuf) < 0)
     {
@@ -68,7 +67,6 @@ int scrivi_immagine(const char *filename, Color *data, int width, int height)
         return 1;
     }
 
-    // Write data
     memcpy(addr, preambolo, preambolo_size);
     memcpy((char *)addr + preambolo_size - 1, data, data_size);
 

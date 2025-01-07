@@ -2,8 +2,7 @@
 
 #pragma once
 
-//Define the data types
-
+// Definizione della struttura dati
 typedef struct
 {
     float x;
@@ -11,7 +10,6 @@ typedef struct
     float z;
 } Vec3;
 
-//Define the function prototypes
-
+//Prototipi delle funzioni
 Vec3 normalize(Vec3 v);
 float prodotto_scalare(Vec3 v1, Vec3 v2);

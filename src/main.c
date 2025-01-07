@@ -14,7 +14,7 @@
 
 int main(int argc, char *argv[]) {
     if (argc != 5) {
-        printf("Usage: %s scene_file.txt image_file.ppm width height\n", argv[0]);
+        printf("Utilizzo corretto: %s scene_file.txt image_file.ppm width height\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
