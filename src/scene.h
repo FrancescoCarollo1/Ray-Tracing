@@ -38,5 +38,5 @@ typedef struct
 
 //Function prototypes
 Scene *create_empty_scene();
-void delete_scene(Scene *s);
 int read_scene(const char *filename, Scene *scene);
+void delete_scene(Scene *s);

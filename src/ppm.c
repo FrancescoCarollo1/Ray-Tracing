@@ -27,7 +27,7 @@ int scrivi_immagine(const char *filename, Color *data, int width, int height)
     char *preambolo = (char *)malloc((preambolo_size) * sizeof(char));
     if (preambolo == NULL)
     {
-        perror("Can't allocate memory for preambolo");
+        printf("Can't allocate memory for preambolo\n");
         return 1;
     }
     sprintf(preambolo, "P6\n%d %d\n255\n", width, height);
@@ -36,21 +36,21 @@ int scrivi_immagine(const char *filename, Color *data, int width, int height)
     FILE *file = fopen(filename, "w+");
     if (file == NULL)
     {
-        perror("Error opening file");
+        printf("Error opening file\n");
         return 1;
     }
 
     int fd = fileno(file);
     if (fd == -1)
     {
-        perror("Error getting file descriptor");
+        printf("Error getting file descriptor\n");
         return 1;
     }
 
     // Ensure file is large enough
     if (ftruncate(fd, preambolo_size + data_size) == -1)
     {
-        perror("Error setting file size");
+        printf("Error setting file size\n");
         return 1;
     }
 
@@ -58,13 +58,13 @@ int scrivi_immagine(const char *filename, Color *data, int width, int height)
     struct stat statbuf;
     if (stat(filename, &statbuf) < 0)
     {
-        perror("stat error");
+        printf("stat error\n");
         return 1;
     }
     void *addr = mmap(NULL, statbuf.st_size, PROT_WRITE, MAP_SHARED, fd, 0);
     if (addr == MAP_FAILED)
     {
-        perror("Error mapping the file");
+        printf("Error mapping the file\n");
         return 1;
     }
 

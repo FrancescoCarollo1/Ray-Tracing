@@ -9,16 +9,15 @@
 #include "vec3.h"
 
 
-//Define the data types
-
 Scene *create_empty_scene()
 {
     Scene *scene = (Scene *)malloc(sizeof(Scene));
     if (scene == NULL)
     {
-        perror("Can't allocate memory for scene");
+        printf("Can't allocate memory for scene\n");
         return NULL;
     }
+    //La memoria per le sfere viene allocata in read_scene
     scene->spheres = NULL;
     scene->num_spheres = 0;
     return scene;
@@ -31,38 +30,36 @@ int read_scene(const char *filename, Scene *scene)
     FILE *file = fopen(filename, "r");
     if (file == NULL)
     {
-        perror("Error opening file");
+        printf("Error opening file\n");
         return 1;
     }
 
     // Read the viewport
     if (fscanf(file, "VP %f %f %f\n", &scene->viewport.width, &scene->viewport.height, &scene->viewport.depth) != 3)
     {
-        perror("Error reading viewport");
+        printf("Error reading viewport\n");
         return 1;
     }
 
     // Read the background color
-
     if (fscanf(file, "BG %hhu %hhu %hhu\n", &scene->background_color.r, &scene->background_color.g, &scene->background_color.b) != 3)
     {
-        perror("Error reading background color");
+        printf("Error reading background color\n");
         return 1;
     }
 
     // Read the number of spheres
     if (fscanf(file, "OBJ_N %d\n", &scene->num_spheres) != 1)
     {
-        perror("Error reading number of spheres");
+        printf("Error reading number of spheres\n");
         return 1;
     }
-   
     
     // Allocate memory for the spheres
     scene->spheres = (Sphere *)malloc(scene->num_spheres * sizeof(Sphere));
     if (scene->spheres == NULL)
     {
-        perror("Can't allocate memory for spheres");
+        printf("Can't allocate memory for spheres\n");
         return 1;
     }
 
@@ -71,11 +68,9 @@ int read_scene(const char *filename, Scene *scene)
     {
        if (fscanf(file, "S %f %f %f %f %hhu %hhu %hhu\n", &scene->spheres[i].center.x, &scene->spheres[i].center.y, &scene->spheres[i].center.z, &scene->spheres[i].radius, &scene->spheres[i].color.r, &scene->spheres[i].color.g, &scene->spheres[i].color.b) != 7)
        {
-           perror("Error reading sphere");
+           printf("Error reading sphere\n");
            return 1;
        }
-
-
     }
     return 0;
 }
