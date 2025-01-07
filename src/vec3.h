@@ -1,4 +1,4 @@
-//Francesco Carollo SM3201419
+// Francesco Carollo SM3201419
 
 #pragma once
 
@@ -10,6 +10,6 @@ typedef struct
     float z;
 } Vec3;
 
-//Prototipi delle funzioni
+// Dichiarazione delle funzioni
 Vec3 normalize(Vec3 v);
 float prodotto_scalare(Vec3 v1, Vec3 v2);

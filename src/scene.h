@@ -1,8 +1,8 @@
 //Francesco Carollo SM3201419
 
 #pragma once
-#include <stdint.h>
 #include "vec3.h"
+#include "color.h"
 
 // Definizione delle strutture dati
 typedef struct 
@@ -11,13 +11,6 @@ typedef struct
     float height;
     float depth;
 }Viewport;
-
-typedef struct __attribute__ ((packed))
-{
-   uint8_t r;
-   uint8_t g;
-   uint8_t b;
-}Color;
 
 typedef struct 
 {
@@ -34,7 +27,7 @@ typedef struct
     Sphere *spheres;
 }Scene;
 
-// Prototipi delle funzioni
+// Dichiarazione delle funzioni
 Scene *create_empty_scene();
 int read_scene(const char *filename, Scene *scene);
 void delete_scene(Scene *s);

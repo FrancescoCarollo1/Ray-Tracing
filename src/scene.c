@@ -4,9 +4,8 @@
 #include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include "scene.h"
-#include "vec3.h"
+
 
 
 Scene *create_empty_scene()
@@ -17,7 +16,7 @@ Scene *create_empty_scene()
         printf("Can't allocate memory for scene\n");
         return NULL;
     }
-    //La memoria per le sfere viene allocata in read_scene
+    // La memoria per le sfere viene allocata in read_scene
     scene->spheres = NULL;
     scene->num_spheres = 0;
     return scene;

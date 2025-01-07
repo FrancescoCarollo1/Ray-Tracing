@@ -1,17 +1,17 @@
 // Francesco Carollo SM3201419
 
 #define _POSIX_C_SOURCE 200809L
+#include "ppm.h"
+#include <math.h>
 #include <stdio.h>
 #include <stddef.h>
-#include <math.h>
 #include <string.h>
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include "scene.h"
 
-// Note: cleanup is done by the OS in case of error
+// Note: Il sistema operativo esegue in automatico la disallocazione della memoria al termine dell'esecuzione
 
 // La funzione scrivi_immagine scrive un'immagine in formato PPM
 int scrivi_immagine(const char *filename, Color *data, int width, int height)

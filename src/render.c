@@ -2,11 +2,9 @@
 
 #include "render.h"
 #include "vec3.h"
-#include <stdlib.h>
 #include <math.h>
-#include "ppm.h"
-#include "scene.h"
 #include <omp.h>
+#include <stdlib.h>
 
 // Questa funzione implementa il calcolo della distanza tra un raggio e una sfera
 float distanza_sfera(Vec3 ray, Sphere sphere)
@@ -71,22 +69,6 @@ void omp_render_scene(Scene *scene, Color *pixel_out, int width, int height)
                 Vec3 norm_ray = normalize(ray);
                 pixel_out[i + j * width] = colore_raggio(norm_ray, scene);
             }
-        }
-    }
-}
-
-void render_scene(Scene *scene, Color *pixel_out, int width, int height)
-{
-    for (int i = 0; i < width; i++)
-    {
-        for (int j = 0; j < height; j++)
-        {
-            Vec3 ray;
-            ray.x = (2 * i / (float)width - 1) * (scene->viewport.width / 2);
-            ray.y = (2 * j / (float)height - 1) * (-scene->viewport.height / 2) ;
-            ray.z = scene->viewport.depth ;
-            Vec3 norm_ray = normalize(ray);
-            pixel_out[i + j * width] = colore_raggio(norm_ray, scene);
         }
     }
 }
