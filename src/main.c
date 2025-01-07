@@ -12,31 +12,30 @@
 
 
 
-
-
 int main(int argc, char *argv[]) {
     if (argc != 5) {
-        printf("Usage: %s [scene_file.txt] [image_file.ppm] [width] [height]\n", argv[0]);
+        printf("Usage: %s scene_file.txt image_file.ppm width height\n", argv[0]);
         exit(EXIT_FAILURE);
     }
+
     const char *scene_file = argv[1];
     const char *image_file = argv[2];
     int width = atoi(argv[3]);
     int height = atoi(argv[4]);
-    Color *data = malloc(width * height * sizeof(Color));
-    memset(data, 0, width * height * sizeof(Color));
-    Scene *scene = create_empty_scene();
-    read_scene("prove_txt/prova1.txt", scene);
 
-    if (scene == NULL) {
+    Color *pixel_data = malloc(width * height * sizeof(Color));
+    memset(pixel_data, 0, width * height * sizeof(Color));
+    Scene *scene = create_empty_scene();
+
+    if ( read_scene(scene_file, scene) != 0) {
         printf("Errore nel caricamento della scena\n");
         exit(EXIT_FAILURE);
     }
 
-    render_scene(scene, data, width, height);
-    scrivi_immagine("renders/prova1.ppm", data, width, height);
+    omp_render_scene(scene, pixel_data, width, height);
+    scrivi_immagine(image_file, pixel_data, width, height);
     printf("Successo. Il rendering è stato salvato come %s\n", image_file);
-    free(scene);
+    delete_scene(scene);
 
     exit(EXIT_SUCCESS);
 }
