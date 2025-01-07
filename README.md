@@ -1,35 +1,39 @@
 # Ray-Tracing
 
 ### Breve introduzione 
-Progetto del corso di Programmazione Avanzata e Parallela.  
-Il progetto consiste nel costruire un ray tracer che possa effetturare rendering di immagini composte da sfere di varia misura e colore.
-L'idea del ray tracing è quella di avere una serie di "raggi" (almeno uno per pixel) emessi da una camera attraverso un viewport che vanno a intersecare diversi oggetti in una scena. Il colore dell'oggetto più vicino che
-viene intersecato corrisponderà poi al colore del pixel a cui è associato il raggio.
+Progetto in Linguaggio C del corso di Programmazione Avanzata e Parallela.  
+Il progetto consiste nel costruire un ray tracer che possa effetturare rendering di immagini composte da sfere di varie dimensioni e colori.
+L'idea del ray tracing è quella di emettere una serie di "raggi" (almeno uno per pixel) da una camera attraverso un viewport. Questi raggi intersecano gli oggetti nella scena, e il colore del pixel corrisponderà a quello dell'oggetto più vicino intersecato.
 
-### src
-All'interno di src sono contenuti i file C.
+---
 
-- Il file ```vec3``` gestisce la creazione e le operazioni da svolgere sui raggi del ray tracer.
+### Struttura dei file sorgenti (src)
+Nella cartella src sono contenuti i file sorgenti C.
 
-- Il file ```scene``` gestisce creazione, riempimento e cancellazione della scena.
+- Il file ```vec3``` gestisce la creazione e le operazioni sui vettori tridimensionali.
 
-- Il file ```render``` legge la rappresentazione della scena e colora i pixel.
+- Il file ```scene``` si occupa di creazione, gestione e cancellazione della scena.
 
-- Il file ```ppm``` compone l'immagine in formato ppm.
+- Il file ```render``` legge la rappresentazione della scena e calcola il colore dei pixel.
 
-### note particolari
+- Il file ```ppm``` compone l'immagine finale in formato ppm.
+
+---
+
+### Note particolari
 In```render.c ``` l'unica funzione parallelizzata è ```omp_render_scene``` sebbene anche ```colore_raggio``` venga chiamata dentro una sezione parallela. Questo per evitare race conditions.
 
-### build
-Questa cartella contiene tutti i file '.o'.
+---
 
-### prove_txt
-In questa cartella sono presenti vari file di scena per sperimentare con varie disposizioni del viewport e delle sfere.
+## Struttura delle cartelle
+- *build*:  contiene tutti i file oggetto ('.o') generati durante la compilazione.
+- *prove_txt*: contiene i vari file di scena per sperimentare con varie configurazioni di viewport e sfere.
 
-### renders
-In questa cartella vengono salvati i file in formato ppm.
+- *renders*: In questa cartella vengono salvati i file in formato PPM.
 
-### sintassi
+---
+
+### Sintassi di Esecuzione
 Per far funzionare correttamente il programma è necessario che l'input sia scritto in questa forma:
 
 ```bash
@@ -38,14 +42,14 @@ Per far funzionare correttamente il programma è necessario che l'input sia scri
 Assicurarsi che il percorso del file di scena e del file immagine siano specificati correttamente.
 
 # Esempio di utilizzo
-### Eseseguibile
-Innanzitutto è necessario compilare i file necessari con
+### Compilazione
+Innanzitutto è necessario compilare i file necessari con:
 ```bash
 make
 ```
 
 ### Esecuzione
-
+Esempio di esecuzione del comando
 ```bash
 ./main prove_txt/prova11.txt renders/immagine11.ppm 1920 1080
 ```
