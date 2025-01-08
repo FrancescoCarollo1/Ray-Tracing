@@ -1,4 +1,4 @@
-//Francesco Carollo SM3201419
+// Francesco Carollo SM3201419
 
 #pragma once
 #include "color.h"
