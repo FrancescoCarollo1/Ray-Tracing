@@ -10,7 +10,11 @@ SOURCES  := $(wildcard $(SRCDIR)/*.c)
 HEADERS := $(wildcard $(HEADDIR)/*.h)
 OBJECTS  := $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
-all: main
+all: prepare main
+
+prepare:
+	@mkdir -p build
+	@mkdir -p renders	
 
 main: ${OBJECTS}
 	${CC} ${CFLAGS} -o $@ $^

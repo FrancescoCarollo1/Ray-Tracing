@@ -27,10 +27,10 @@ In```render.c ``` l'unica funzione parallelizzata è ```omp_render_scene``` sebb
 
 ## Struttura delle cartelle
 - *build*:  contiene tutti i file oggetto ('.o') generati durante la compilazione.
-- *prove_txt*: contiene i vari file di scena per sperimentare con varie configurazioni di viewport e sfere.
-
+- *prove_txt*: contiene i vari file di scena per sperimentare con varie configurazioni di viewport e sfere.  
 - *renders*: In questa cartella vengono salvati i file in formato PPM.
-
+- *src* : Qui viene salvato il codice sorgente.  
+**NOTA** :per il corretto funzionamento di make/make clean è necessario avere questa struttura. 
 ---
 
 ### Sintassi di Esecuzione
@@ -47,6 +47,7 @@ Innanzitutto è necessario compilare i file necessari con:
 ```bash
 make
 ```
+**nota** : make crea le cartelle build e renders
 
 ### Esecuzione
 Esempio di esecuzione del comando
