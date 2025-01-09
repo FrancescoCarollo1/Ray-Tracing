@@ -1,4 +1,4 @@
-#Francesco Carollo SM3201419
+# Francesco Carollo SM3201419
 
 CC = gcc
 CFLAGS = -g -Wall -pedantic -std=c17 -lm -fopenmp
