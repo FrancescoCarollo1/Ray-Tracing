@@ -6,20 +6,16 @@
 #include <omp.h>
 #include <stdlib.h>
 
-// --- MODIFICA 1: Aggiunti gli header necessari ---
-#include "color.h"  // Per la struct Color (uint8_t)
-#include "ppm.h"    // (Probabilmente definisce Color o Vec3)
-#include "scene.h"  // Per la struct Scene
+#include "color.h"  
+#include "ppm.h"    
+#include "scene.h"  
 
-// --- MODIFICA 2: Funzione helper ---
-// Converte la tua struct Color (uint8_t 0-255) in Vec3 (float 0.0-1.0)
-// per i calcoli.
+
 Vec3 color_to_vec3(Color c) {
     return (Vec3){(double)c.r / 255.0, (double)c.g / 255.0, (double)c.b / 255.0};
 }
 
 // Questa funzione implementa il calcolo della distanza tra un raggio e una sfera
-// (Questa funzione è invariata)
 float distanza_sfera(Vec3 ray, Sphere sphere)
 {
     float a = prodotto_scalare(ray, ray);
@@ -48,7 +44,7 @@ float distanza_sfera(Vec3 ray, Sphere sphere)
     return t1 < t2 ? t1 : t2;
 }
 
-// --- MODIFICA 3: La funzione 'colore_raggio' ora usa Vec3 ---
+
 // Calcola il colore in formato Vec3 (float) per permettere la media.
 Vec3 colore_raggio_vec3(Vec3 ray, Scene *scene)
 {
@@ -69,13 +65,10 @@ Vec3 colore_raggio_vec3(Vec3 ray, Scene *scene)
     return colore;
 }
 
-// --- MODIFICA 4: 'omp_render_scene' aggiornata per Antialiasing ---
-// Questa funzione riempie un array di pixel (di tipo Color - uint8_t)
-// con i colori della scena, implementando l'antialiasing.
+
 void omp_render_scene(Scene *scene, Color *pixel_out, int width, int height)
 {
-    // Inizia con 50 campioni. Puoi aumentarlo a 100 o più
-    // per una qualità migliore (ma un rendering più lento).
+    
     const int SAMPLES_PER_PIXEL = 50;
 
     #pragma omp parallel
@@ -85,10 +78,10 @@ void omp_render_scene(Scene *scene, Color *pixel_out, int width, int height)
         {
             for (int j = 0; j < height; j++)
             {
-                // 1. Accumulatore in Vec3 (float) per i calcoli
+            
                 Vec3 total_color_vec = {0.0, 0.0, 0.0};
 
-                // 2. Ciclo di campionamento (Antialiasing)
+                //Ciclo di campionamento (Antialiasing)
                 for (int s = 0; s < SAMPLES_PER_PIXEL; s++)
                 {
                     // Genera un offset casuale tra 0.0 e 1.0
@@ -98,7 +91,7 @@ void omp_render_scene(Scene *scene, Color *pixel_out, int width, int height)
                     double u = (double)i + random_u;
                     double v = (double)j + random_v;
 
-                    // Crea il raggio (in formato Vec3)
+                    // Crea il raggio 
                     Vec3 ray;
                     ray.x = (2 * u / (float)width - 1) * (scene->viewport.width / 2);
                     ray.y = (2 * v / (float)height - 1) * (-scene->viewport.height / 2) ;
@@ -106,35 +99,30 @@ void omp_render_scene(Scene *scene, Color *pixel_out, int width, int height)
                     
                     Vec3 norm_ray = normalize(ray);
 
-                    // Calcola il colore (in formato Vec3)
+                    // Calcola il colore 
                     Vec3 sample_color = colore_raggio_vec3(norm_ray, scene);
 
-                    // Accumula il colore (in formato Vec3)
+                    // Accumula il colore 
                     total_color_vec.x += sample_color.x;
                     total_color_vec.y += sample_color.y;
                     total_color_vec.z += sample_color.z;
                 }
 
-                // 3. Fai la media dei colori (sempre in Vec3)
+                //media dei colori 
                 double scale = 1.0 / SAMPLES_PER_PIXEL;
                 total_color_vec.x *= scale;
                 total_color_vec.y *= scale;
                 total_color_vec.z *= scale;
 
-                // 4. Correzione Gamma (sqrt) - Fondamentale
                 total_color_vec.x = sqrt(total_color_vec.x);
                 total_color_vec.y = sqrt(total_color_vec.y);
                 total_color_vec.z = sqrt(total_color_vec.z);
 
-                // --- 5. TRADUZIONE FINALE (da Vec3 a Color) ---
-                // Converti il colore finale (float 0.0-1.0)
-                // nel formato di output (uint8_t 0-255).
+
                 Color final_color;
                 final_color.r = (uint8_t)(total_color_vec.x * 255.999);
                 final_color.g = (uint8_t)(total_color_vec.y * 255.999);
                 final_color.b = (uint8_t)(total_color_vec.z * 255.999);
-
-                // 6. Scrivi il colore finale (in formato uint8_t) nel buffer
                 pixel_out[i + j * width] = final_color;
             }
         }
