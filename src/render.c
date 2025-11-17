@@ -1,22 +1,21 @@
 // Francesco Carollo SM3201419
+// Questo file contiene le funzioni per il rendering della scena
 
 #include "render.h"
 #include "vec3.h"
+#include "color.h"
+#include "ppm.h"
+#include "scene.h"
 #include <math.h>
 #include <omp.h>
 #include <stdlib.h>
-
-#include "color.h"  
-#include "ppm.h"    
-#include "scene.h"  
-
-
 Vec3 color_to_vec3(Color c) {
     return (Vec3){(double)c.r / 255.0, (double)c.g / 255.0, (double)c.b / 255.0};
 }
 
+
 // Questa funzione implementa il calcolo della distanza tra un raggio e una sfera
-float distanza_sfera(Vec3 ray, Sphere sphere)
+    float distanza_sfera(Vec3 ray, Sphere sphere)
 {
     float a = prodotto_scalare(ray, ray);
     float b = -2 * (prodotto_scalare(ray, sphere.center));
@@ -45,7 +44,8 @@ float distanza_sfera(Vec3 ray, Sphere sphere)
 }
 
 
-// Calcola il colore in formato Vec3 (float) per permettere la media.
+
+
 Vec3 colore_raggio_vec3(Vec3 ray, Scene *scene)
 {
     // Converte il colore di sfondo da Color (uint8_t) a Vec3 (float)
@@ -64,12 +64,11 @@ Vec3 colore_raggio_vec3(Vec3 ray, Scene *scene)
     }
     return colore;
 }
-
-
 void omp_render_scene(Scene *scene, Color *pixel_out, int width, int height)
 {
+    const int SAMPLES_PER_PIXEL = 5;
     
-    const int SAMPLES_PER_PIXEL = 50;
+    Camera cam = scene->camera;
 
     #pragma omp parallel
     {
@@ -78,37 +77,33 @@ void omp_render_scene(Scene *scene, Color *pixel_out, int width, int height)
         {
             for (int j = 0; j < height; j++)
             {
-            
                 Vec3 total_color_vec = {0.0, 0.0, 0.0};
 
-                //Ciclo di campionamento (Antialiasing)
                 for (int s = 0; s < SAMPLES_PER_PIXEL; s++)
                 {
-                    // Genera un offset casuale tra 0.0 e 1.0
-                    double random_u = (double)rand() / (double)RAND_MAX;
-                    double random_v = (double)rand() / (double)RAND_MAX;
+                    // Calcola (u,v) normalizzati (0.0 a 1.0) con offset
+                    double u = ((double)i + (double)rand() / (double)RAND_MAX) / (width - 1);
+                    double v = ((double)j + (double)rand() / (double)RAND_MAX) / (height - 1);
 
-                    double u = (double)i + random_u;
-                    double v = (double)j + random_v;
-
-                    // Crea il raggio 
-                    Vec3 ray;
-                    ray.x = (2 * u / (float)width - 1) * (scene->viewport.width / 2);
-                    ray.y = (2 * v / (float)height - 1) * (-scene->viewport.height / 2) ;
-                    ray.z = scene->viewport.depth ;
+                    // Calcola la direzione del raggio dalla camera
                     
-                    Vec3 norm_ray = normalize(ray);
+                    Vec3 h_offset = mul_scalar(cam.horizontal, u);
+                    Vec3 v_offset = mul_scalar(cam.vertical, v);
+                    Vec3 target = add(cam.lower_left_corner, h_offset);
+                    target = add(target, v_offset);
+                    
+                    Vec3 ray_direction = sub(target, cam.origin);
+                    Vec3 norm_ray = normalize(ray_direction);
 
-                    // Calcola il colore 
                     Vec3 sample_color = colore_raggio_vec3(norm_ray, scene);
 
-                    // Accumula il colore 
+                    // Accumula il colore
                     total_color_vec.x += sample_color.x;
                     total_color_vec.y += sample_color.y;
                     total_color_vec.z += sample_color.z;
                 }
 
-                //media dei colori 
+                // ... (media, correzione gamma, e traduzione finale in 'Color')
                 double scale = 1.0 / SAMPLES_PER_PIXEL;
                 total_color_vec.x *= scale;
                 total_color_vec.y *= scale;
@@ -118,11 +113,11 @@ void omp_render_scene(Scene *scene, Color *pixel_out, int width, int height)
                 total_color_vec.y = sqrt(total_color_vec.y);
                 total_color_vec.z = sqrt(total_color_vec.z);
 
-
                 Color final_color;
                 final_color.r = (uint8_t)(total_color_vec.x * 255.999);
                 final_color.g = (uint8_t)(total_color_vec.y * 255.999);
                 final_color.b = (uint8_t)(total_color_vec.z * 255.999);
+
                 pixel_out[i + j * width] = final_color;
             }
         }

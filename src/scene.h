@@ -14,6 +14,14 @@ typedef struct
 
 typedef struct 
 {
+    Vec3 origin;
+    Vec3 lower_left_corner;
+    Vec3 horizontal;    
+    Vec3 vertical;
+}Camera;
+
+typedef struct 
+{
     Vec3 center;
     float radius;
     Color color;
@@ -21,13 +29,14 @@ typedef struct
 
 typedef struct
 {
-    Color background_color;
-    Viewport viewport;
     int num_spheres;
     Sphere *spheres;
+    Color background_color;
+    Camera camera;
 }Scene;
 
 // Dichiarazione delle funzioni
 Scene *create_empty_scene();
 int read_scene(const char *filename, Scene *scene);
+void setup_camera(Scene* scene, Vec3 origin, Vec3 lookat, double vfov, double aspect_ratio);
 void delete_scene(Scene *s);
