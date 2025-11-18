@@ -20,6 +20,7 @@ typedef struct
     Vec3 vertical;
 }Camera;
 
+
 typedef struct 
 {
     Vec3 center;
