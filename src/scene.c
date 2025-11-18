@@ -59,7 +59,15 @@ int read_scene(const char *filename, Scene *scene)
     // Lettura delle sfere
     for (int i = 0; i < scene->num_spheres; i++)
     {
-       if (fscanf(file, "S %f %f %f %f %hhu %hhu %hhu\n", &scene->spheres[i].center.x, &scene->spheres[i].center.y, &scene->spheres[i].center.z, &scene->spheres[i].radius, &scene->spheres[i].color.r, &scene->spheres[i].color.g, &scene->spheres[i].color.b) != 7)
+       if (fscanf(file, "S %f %f %f %f %hhu %hhu %hhu %d %f\n", &scene->spheres[i].center.x,
+         &scene->spheres[i].center.y, 
+         &scene->spheres[i].center.z,
+          &scene->spheres[i].radius, 
+          &scene->spheres[i].color.r, 
+          &scene->spheres[i].color.g, 
+          &scene->spheres[i].color.b, 
+          &scene->spheres[i].material, 
+          &scene->spheres[i].mat_param) != 9)
        {
            printf("Error reading sphere\n");
            fclose(file);

@@ -4,6 +4,7 @@
 #include "vec3.h"
 #include "color.h"
 
+
 // Definizione delle strutture dati
 typedef struct 
 {
@@ -20,12 +21,19 @@ typedef struct
     Vec3 vertical;
 }Camera;
 
+typedef enum {
+    DIFFUSE = 0,    
+    REFLECTIVE = 1,
+    REFRACTIVE = 2,
+} MaterialType;
 
 typedef struct 
 {
     Vec3 center;
     float radius;
     Color color;
+    MaterialType material;
+    double mat_param; 
 }Sphere;
 
 typedef struct
