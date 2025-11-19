@@ -200,6 +200,7 @@ Vec3 colore_raggio_ricorsivo(Vec3 ray_origin, Vec3 ray_dir, Scene *scene, int de
         {
             emitted = mul_scalar(color_to_vec3(obj.color), obj.mat_param);
             did_scatter = false; // Le luci non riflettono 
+        }
         // 0: LAMBERTIAN (OPACO)
         else if (obj.material == 0)    
         {
