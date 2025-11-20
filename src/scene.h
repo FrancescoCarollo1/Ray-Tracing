@@ -49,6 +49,14 @@ typedef struct
     double mat_param; 
 }Sphere;
 
+typedef struct {
+    Vec3 v0;
+    Vec3 v1;
+    Vec3 v2;
+    Color color;
+    MaterialType material;
+    double mat_param;
+} Triangle;
 
 // 1. Axis Aligned Bounding Box (AABB)
 typedef struct {
@@ -68,6 +76,10 @@ typedef struct
 {
     int num_spheres;
     Sphere *spheres;
+
+    int num_triangles;
+    Triangle *triangles;
+    
     Color background_color;
 
     Camera camera;
