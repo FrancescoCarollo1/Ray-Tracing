@@ -69,7 +69,8 @@ typedef struct BVHNode {
     AABB box;               
     struct BVHNode *left;       
     struct BVHNode *right;       
-    Sphere *sphere;             
+    Sphere *sphere;
+    Triangle *triangle;             
 } BVHNode;
 
 typedef struct
@@ -85,6 +86,7 @@ typedef struct
     Camera camera;
 
     BVHNode *bvh_root; 
+    BVHNode *bvh_tri_root;
 }Scene;
 
 // Dichiarazione delle funzioni

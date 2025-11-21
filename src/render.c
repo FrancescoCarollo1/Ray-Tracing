@@ -115,153 +115,158 @@ double hit_triangle(Vec3 ray_origin, Vec3 ray_dir, Triangle tri, Vec3 *out_norma
 }
 
 // BVH Traversal 
-bool hit_bvh_node(BVHNode *node, Vec3 r_orig, Vec3 r_dir, double t_min, double t_max, double *closest_t, int *hit_index, Scene *scene) {
+// BVH Traversal Generico
+bool hit_bvh_node(BVHNode *node, Vec3 r_orig, Vec3 r_dir, double t_min, double t_max, 
+                  double *closest_t, int *hit_index, Scene *scene, int mode) 
+{
+    // 1. Check Box
     if (!hit_aabb(node->box, r_orig, r_dir, t_min, t_max)) return false;
 
-    if (node->sphere != NULL) { // Foglia
+    // 2. Check Foglia
+    bool hit_leaf = false;
+    
+    // Caso Sfera
+    if (node->sphere != NULL) {
         double t = distanza_sfera(r_dir, r_orig, *(node->sphere));
         if (t < *closest_t && t > 0.001) {
             *closest_t = t;
-            *hit_index = (int)(node->sphere - scene->spheres); 
+            *hit_index = (int)(node->sphere - scene->spheres); // Indice array
+            return true;
+        }
+        return false;
+    }
+    
+    // Caso Triangolo
+    if (node->triangle != NULL) {
+        Vec3 dummy_norm; // La normale la ricalcoliamo dopo
+        double t = hit_triangle(r_orig, r_dir, *(node->triangle), &dummy_norm);
+        if (t < *closest_t && t > 0.001) {
+            *closest_t = t;
+            *hit_index = (int)(node->triangle - scene->triangles);
             return true;
         }
         return false;
     }
 
-    bool hit_left = hit_bvh_node(node->left, r_orig, r_dir, t_min, t_max, closest_t, hit_index, scene);
-    bool hit_right = hit_bvh_node(node->right, r_orig, r_dir, t_min, (hit_left ? *closest_t : t_max), closest_t, hit_index, scene);
+    // 3. Check Figli
+    bool hit_left = hit_bvh_node(node->left, r_orig, r_dir, t_min, t_max, closest_t, hit_index, scene, mode);
+    bool hit_right = hit_bvh_node(node->right, r_orig, r_dir, t_min, (hit_left ? *closest_t : t_max), closest_t, hit_index, scene, mode);
+
     return hit_left || hit_right;
 }
 
 
-// --- KERNEL RICORSIVO ---
+
 Vec3 colore_raggio_ricorsivo(Vec3 ray_origin, Vec3 ray_dir, Scene *scene, int depth, uint32_t *seed)
 {
     if (depth <= 0) return (Vec3){0.0, 0.0, 0.0};
 
     double closest_t = INFINITY;
-    int hit_index = -1;       // Indice Sfera
-    int hit_tri_index = -1;   // Indice Triangolo
+    int hit_idx_sph = -1;
+    int hit_idx_tri = -1;
 
-    // 1. Cerca intersezione Sfere (BVH)
-    if (scene->bvh_root != NULL) {
-        hit_bvh_node(scene->bvh_root, ray_origin, ray_dir, 0.001, INFINITY, &closest_t, &hit_index, scene);
-    } else {
-        for (int i = 0; i < scene->num_spheres; i++) {
-             double t = distanza_sfera(ray_dir, ray_origin, scene->spheres[i]);
-             if (t < closest_t) { closest_t = t; hit_index = i; }
+    // 1. BVH Sfere
+    if (scene->bvh_root) {
+        hit_bvh_node(scene->bvh_root, ray_origin, ray_dir, 0.001, INFINITY, &closest_t, &hit_idx_sph, scene, 0);
+    } else { // Fallback
+        for(int i=0; i<scene->num_spheres; i++) {
+            double t = distanza_sfera(ray_dir, ray_origin, scene->spheres[i]);
+            if(t < closest_t) { closest_t = t; hit_idx_sph = i; }
         }
     }
 
-    // 2. Cerca intersezione Triangoli
-    Vec3 tri_normal = {0,0,0};
-    Vec3 temp_normal;
-    for (int i = 0; i < scene->num_triangles; i++) {
-        double t = hit_triangle(ray_origin, ray_dir, scene->triangles[i], &temp_normal);
-        if (t < closest_t) {
-            closest_t = t;
-            hit_tri_index = i;
-            hit_index = -1; // Dimentica la sfera, il triangolo è più vicino
-            tri_normal = temp_normal;
+    // 2. BVH Triangoli
+    if (scene->bvh_tri_root) {
+        // Resettiamo indice hit sfera se troviamo un triangolo più vicino
+        int temp_idx = -1; 
+        if (hit_bvh_node(scene->bvh_tri_root, ray_origin, ray_dir, 0.001, closest_t, &closest_t, &temp_idx, scene, 1)) {
+            hit_idx_tri = temp_idx;
+            hit_idx_sph = -1; 
+        }
+    } else { // Fallback loop
+        Vec3 dummy;
+        for(int i=0; i<scene->num_triangles; i++) {
+            double t = hit_triangle(ray_origin, ray_dir, scene->triangles[i], &dummy);
+            if(t < closest_t) { closest_t = t; hit_idx_tri = i; hit_idx_sph = -1; }
         }
     }
 
-    // --- HIT PROCESSING ---
-    if (hit_index != -1 || hit_tri_index != -1)
-    {
-       
+    //  HIT PROCESSING 
+    if (hit_idx_sph != -1 || hit_idx_tri != -1) {
         Vec3 P = add(ray_origin, mul_scalar(ray_dir, closest_t));
         Vec3 N;
         MaterialType mat;
         Color col;
         double mat_param;
 
-        if (hit_index != -1) {
-            // Colpita Sfera
-            Sphere obj = scene->spheres[hit_index];
+        if (hit_idx_sph != -1) {
+            Sphere obj = scene->spheres[hit_idx_sph];
             N = normalize(sub(P, obj.center));
             mat = obj.material; col = obj.color; mat_param = obj.mat_param;
         } else {
-            // Colpito Triangolo
-            Triangle obj = scene->triangles[hit_tri_index];
-            N = tri_normal;
+            Triangle obj = scene->triangles[hit_idx_tri];
+            Vec3 e1 = sub(obj.v1, obj.v0);
+            Vec3 e2 = sub(obj.v2, obj.v0);
+            N = normalize(cross(e1, e2)); // Flat shading normale
             mat = obj.material; col = obj.color; mat_param = obj.mat_param;
         }
-
+        
+        
         bool front_face = prodotto_scalare(ray_dir, N) < 0;
         Vec3 outward_normal = front_face ? N : mul_scalar(N, -1.0);
-
-        Vec3 emitted = {0, 0, 0};
-        Vec3 attenuation = {0, 0, 0};
-        Vec3 scattered_origin = {0, 0, 0};
-        Vec3 scattered_dir = {0, 0, 0};
+        
+        Vec3 emitted = {0,0,0};
+        Vec3 attenuation = {0,0,0};
+        Vec3 scattered_origin, scattered_dir;
         bool did_scatter = false;
 
-        // 3: EMISSIVE
         if (mat == EMISSIVE) {
             emitted = mul_scalar(color_to_vec3(col), mat_param);
-            did_scatter = false; 
+            did_scatter = false;
         }
-        // 0: LAMBERTIAN
         else if (mat == DIFFUSE) {
             Vec3 rnd = random_unit_vector(seed);
             scattered_dir = normalize(add(outward_normal, rnd));
-            if ((fabs(scattered_dir.x) < 1e-8) && (fabs(scattered_dir.y) < 1e-8) && (fabs(scattered_dir.z) < 1e-8))
-                scattered_dir = outward_normal;
+            if ((fabs(scattered_dir.x)<1e-8)&&(fabs(scattered_dir.y)<1e-8)&&(fabs(scattered_dir.z)<1e-8)) scattered_dir = outward_normal;
             scattered_origin = add(P, mul_scalar(outward_normal, EPSILON));
             attenuation = color_to_vec3(col);
             did_scatter = true;
         }
-        // 1: METAL
         else if (mat == REFLECTIVE) {
-            Vec3 reflected = reflect(normalize(ray_dir), outward_normal);
-            scattered_dir = normalize(add(reflected, mul_scalar(random_in_unit_sphere(seed), mat_param)));
-            if (prodotto_scalare(scattered_dir, outward_normal) > 0) {
-                scattered_origin = add(P, mul_scalar(outward_normal, EPSILON));
-                attenuation = color_to_vec3(col);
-                did_scatter = true;
-            }
+             Vec3 reflected = reflect(normalize(ray_dir), outward_normal);
+             scattered_dir = normalize(add(reflected, mul_scalar(random_in_unit_sphere(seed), mat_param)));
+             scattered_origin = add(P, mul_scalar(outward_normal, EPSILON));
+             attenuation = color_to_vec3(col);
+             did_scatter = (prodotto_scalare(scattered_dir, outward_normal) > 0);
         }
-        // 2: DIELECTRIC
         else if (mat == REFRACTIVE) {
-            attenuation = (Vec3){1.0, 1.0, 1.0}; 
-            double refraction_ratio = front_face ? (1.0 / mat_param) : mat_param;
-            Vec3 unit_ray_dir = normalize(ray_dir);
-            double cos_theta = fmin(-prodotto_scalare(unit_ray_dir, outward_normal), 1.0);
-            double sin_theta = sqrt(1.0 - cos_theta * cos_theta);
-
-            bool cannot_refract = refraction_ratio * sin_theta > 1.0;
-            double reflect_prob = reflectance(cos_theta, refraction_ratio);
-
-            if (cannot_refract || reflect_prob > random_double_fast(seed)) {
-                scattered_dir = reflect(unit_ray_dir, outward_normal);
-            } else {
-                scattered_dir = refract(unit_ray_dir, outward_normal, refraction_ratio);
-            }
-            
-            double dot_out = prodotto_scalare(scattered_dir, outward_normal);
-            double safe_offset = 0.002; 
-            if (dot_out > 0) scattered_origin = add(P, mul_scalar(outward_normal, safe_offset));
-            else scattered_origin = add(P, mul_scalar(outward_normal, -safe_offset));
-            did_scatter = true;
+             attenuation = (Vec3){1,1,1};
+             double ratio = front_face ? (1.0/mat_param) : mat_param;
+             Vec3 unit_dir = normalize(ray_dir);
+             double cos_theta = fmin(prodotto_scalare(mul_scalar(unit_dir, -1), outward_normal), 1.0);
+             double sin_theta = sqrt(1.0 - cos_theta*cos_theta);
+             bool cannot = ratio * sin_theta > 1.0;
+             if (cannot || reflectance(cos_theta, ratio) > random_double_fast(seed)) scattered_dir = reflect(unit_dir, outward_normal);
+             else scattered_dir = refract(unit_dir, outward_normal, ratio);
+             
+             double dot_out = prodotto_scalare(scattered_dir, outward_normal);
+             double push = (dot_out > 0) ? 0.002 : -0.002;
+             scattered_origin = add(P, mul_scalar(outward_normal, push));
+             did_scatter = true;
         }
 
         if (did_scatter) {
-            Vec3 incoming = colore_raggio_ricorsivo(scattered_origin, scattered_dir, scene, depth - 1, seed);
-            return add(emitted, mul_vec3(attenuation, incoming));
+            return add(emitted, mul_vec3(attenuation, colore_raggio_ricorsivo(scattered_origin, scattered_dir, scene, depth-1, seed)));
         } else {
             return emitted;
         }
     }
 
-    // MISS 
-    if (scene->background_color.r == 0 && scene->background_color.g == 0 && scene->background_color.b == 0) {
-        return (Vec3){0.0, 0.0, 0.0}; 
-    }
-    
-    Vec3 unit_direction = normalize(ray_dir);
-    double t = 0.5 * (unit_direction.y + 1.0);
-    return lerp((Vec3){1.0, 1.0, 1.0}, (Vec3){0.5, 0.7, 1.0}, t);
+    // Sky
+    if (scene->background_color.r == 0 && scene->background_color.g == 0 && scene->background_color.b == 0) return (Vec3){0,0,0};
+    Vec3 unit = normalize(ray_dir);
+    double t = 0.5 * (unit.y + 1.0);
+    return lerp((Vec3){1,1,1}, (Vec3){0.5, 0.7, 1.0}, t);
 }
 
 
